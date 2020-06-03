@@ -47,6 +47,7 @@ type TestSuite struct {
 }
 
 type TestCase struct {
-	Name string  `xml:"name,attr"`
-	Time float64 `xml:"time,attr"`
+	Name     string   `xml:"name,attr"`
+	Time     float64  `xml:"time,attr"`
+	Failures []string `xml:"failure"`
 }

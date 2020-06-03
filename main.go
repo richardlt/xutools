@@ -16,6 +16,12 @@ func main() {
 			{
 				Name:   "pretty",
 				Action: runPretty,
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:  "show-failures",
+						Value: false,
+					},
+				},
 			},
 			{
 				Name:   "sort-duration",
@@ -35,6 +41,8 @@ func main() {
 }
 
 func runPretty(c *cli.Context) error {
+	showFailures := c.Bool("show-failures")
+
 	ts, err := readAll(c.Args().Slice())
 	if err != nil {
 		return err
@@ -62,6 +70,14 @@ func runPretty(c *cli.Context) error {
 				details = " with" + details
 			}
 			fmt.Printf("%s: %s successful tests in %fs%s\n", s.Name, counter, s.Time, details)
+
+			if showFailures {
+				for _, t := range s.TestCases {
+					if len(t.Failures) > 0 {
+						fmt.Printf("\t↳ %s\n", t.Name)
+					}
+				}
+			}
 		}
 	}
 
@@ -102,7 +118,7 @@ func runSortDuration(c *cli.Context) error {
 		if int64(i) == limit {
 			break
 		}
-		fmt.Printf("%s/%s - %f\n", allTestCases[i].suite, allTestCases[i].name, allTestCases[i].time)
+		fmt.Printf("%s/%s - %fs\n", allTestCases[i].suite, allTestCases[i].name, allTestCases[i].time)
 	}
 
 	return nil
